@@ -1,14 +1,12 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 
 public class Manager {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Reader reader0 = new Reader();
         Writer writer = new Writer();
         byte isWrite = 0;
@@ -37,23 +35,27 @@ public class Manager {
                     System.out.println("Введите полный путь к файлу: ");
                     String path = scanner.next();
                     FileReader fr = null;
-                    try {
+                    int lines = countLines(path);
+                    if (lines < 0){
+                        System.out.println("Smth wrong with file");
+                        break;
+                    }
+                    try {//C:\Users\Maxim\Downloads\1kor_regr.csv
                         fr = new FileReader(path);
                         BufferedReader reader = new BufferedReader(fr);
-                        line = reader.readLine().replaceAll("[^\\d+',']","").split(",");
-                        lineX = new double[line.length];
-                        n = line.length;
-                        for (int i=0;i<line.length;i++){
-                            lineX[i]=Double.parseDouble(line[i]);
+                        lineX = new double[lines];
+                        lineY = new double[lines];
+                        for (int i=0; i < lines; ++i) {
+                            line = reader.readLine().split(";");
+                            System.out.println(Arrays.toString(line));
+                            lineX[i] = Double.parseDouble(line[0]);
+                            lineY[i] = Double.parseDouble(line[1]);
                         }
-                        line = reader.readLine().replaceAll("[^\\d+',']","").split(",");
-                        lineY = new double[line.length];
-                        for (int i=0;i<line.length;i++){
-                            lineY[i]=Double.parseDouble(line[i]);
-                        }
+                        n = lines;
                         cycle = false;
                         break;
                     }catch(Exception e){
+                        e.printStackTrace();
                         System.out.println("Can't read this file!");
                     }
                 }
@@ -65,12 +67,22 @@ public class Manager {
                         System.out.println("Введите значения X в строку через пробел:");
                         lineX = new double[n];
                         for (int i = 0; i < lineX.length; i++) {
-                            lineX[i] = Double.parseDouble(scanner.next());
+                            try{
+                                lineX[i] = Double.parseDouble(scanner.next());
+                            }catch (Exception e){
+                                --i;
+                                System.out.println("Wrong! Try again!");
+                            }
                         }
                         System.out.println("Введите значения Y в строку через пробел:");
                         lineY = new double[n];
                         for (int i = 0; i < lineY.length; i++) {
-                            lineY[i] = Double.parseDouble(scanner.next());
+                            try{
+                                lineY[i] = Double.parseDouble(scanner.next());
+                            }catch (Exception e){
+                                --i;
+                                System.out.println("Wrong! Try again!");
+                            }
                         }
                         cycle = false;
                         break;
@@ -79,12 +91,14 @@ public class Manager {
                     }
                 }
                 case "exit": System.exit(0);
-                case "help":
+                case "help": {
                     System.out.println("Следуйте инструкциям на экране.\n" +
                             "Ввод цифры выбирает необходимое действие.\n" +
                             "Всегда доступные команды help и exit.\n" +
                             "help - выводит помощь по работе с программой.\n" +
                             "exit - выход из программы.");
+                    break;
+                }
                 default: {
                     System.out.println("Wrong answer. Try again.");
                     break;
@@ -98,7 +112,8 @@ public class Manager {
             System.out.println("Выберите необходимое действие:\n" +
                     "0 - Вычисление линейного коэффициента корреляции и проверка его на значимость;\n" +
                     "1 - Вычисление коэффициента Спирмена;\n" +
-                    "2 - Рассчет уравнения регрессии, проверка его на адекватность и вывод графика уравнения.");
+                    "2 - Ранги\n"+
+                    "3 - Рассчет уравнения регрессии, проверка его на адекватность и вывод графика уравнения.");
             switch (scanner.next()) {
                 case "0": {
                     double lkk, a = 0.10;
@@ -109,8 +124,8 @@ public class Manager {
                     lkk = math.lineKK();
                     if (isWrite>0)
                         writer.add("Линейный коэффициент корреляции", Double.toString(lkk));
-                    System.out.printf("Линейный коэффициент корреляции %f.6", lkk);
-                    if (math.valueofLKK(lkk, a-0.10<0.001?0:a-0.05<0.001?1:a-0.01<0.001?2:3)) {
+                    System.out.printf("Линейный коэффициент корреляции %.6f\n", lkk);
+                    if (math.valueofLKK(lkk, Math.abs(a-0.10)<0.001?0:Math.abs(a-0.05)<0.001?1:Math.abs(a-0.01)<0.001?2:3)) {
                         System.out.println("Коэффициент значимый");
                         if (isWrite>0)
                             writer.add("Коэффициент значимый", "");
@@ -123,11 +138,34 @@ public class Manager {
                     break;
                 }
                 case "1": {
-                    System.out.printf("Коэффициент Спирмена равен %f.6", math.rangSpirman());
+                    System.out.printf("Коэффициент Спирмена равен %.6f\n", math.rangSpirman());
+                    if (math.rangSpirman() > 0){
+                        System.out.println("Связь прямая");
+                    }else if (math.rangSpirman() < 0){
+                        System.out.println("Связь обратная");
+                    }else{
+                        System.out.println("Связи нет");
+                    }
                     if (isWrite>0)
                         writer.add("Коэффициент Спирмена", Double.toString(math.rangSpirman()));
+                    break;
                 }
-                case "2": {
+                case "2":{
+                    double[][] res = math.rang();
+                    System.out.println("Ранги");
+                    System.out.println("X");
+                    for (int i=0; i< lineX.length; ++i){
+                        System.out.printf("%.3f ",res[0][i]);
+                    }
+                    System.out.println();
+                    System.out.println("Y");
+                    for (int i=0; i< lineX.length; ++i){
+                        System.out.printf("%.3f ",res[1][i]);
+                    }
+                    System.out.println();
+                    break;
+                }
+                case "3": {
                     System.out.println("Выберите тип функции, к которой хотите приводить:\n" +
                             "0 - Линейная\n" +
                             "1 - Полиномиальная\n" +
@@ -183,6 +221,7 @@ public class Manager {
                             }
                         }
                     }
+                    break;
                 }
                 case "exit": System.exit(0);
                 case "help":
@@ -192,6 +231,27 @@ public class Manager {
                             "help - выводит помощь по работе с программой.\n" +
                             "exit - выход из программы.");
             }
+        }
+    }
+
+    public static int countLines(String path) throws IOException {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(path))) {
+            byte[] c = new byte[1024];
+            int count = 0;
+            int readChars = 0;
+            boolean empty = true;
+            while ((readChars = is.read(c)) != -1) {
+                empty = false;
+                for (int i = 0; i < readChars; ++i) {
+                    if (c[i] == '\n') {
+                        ++count;
+                    }
+                }
+            }
+            return (count == 0 && !empty) ? 1 : count;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
         }
     }
 }

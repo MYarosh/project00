@@ -1,6 +1,6 @@
 public class Mathematic {
     private double[] x, y, curX, curY;
-    private double[][] studTable = new double[3][50];
+    private double[][] studTable = new double[4][50];
 
     public Mathematic(double[] x, double[] y){
         this.x = x;
@@ -74,6 +74,84 @@ public class Mathematic {
     }
 }
 
+    public int findNum(Double el, int a, int num){
+        int i=0;
+        if (a==0){
+            for (i=0;i<x.length;++i){
+                if (Math.abs(x[i]-el)<=0.0001){
+                    if(num==0){
+                        break;
+                    }else{
+                        --num;
+                    }
+                }
+            }
+        }else{
+            for (i=0;i<x.length;++i){
+                if (Math.abs(y[i]-el)<=0.0001){
+                    if(num==0){
+                        break;
+                    }else{
+                        --num;
+                    }
+                }
+            }
+        }
+        return i;
+    }
+
+    public double[][] rang(){
+        double[] rangX = new double[x.length], rangY = new double[y.length];
+        for (int i=0; i<x.length; ++i){
+            rangX[i] = x[i]; rangY[i] = y[i];
+        }
+        sort(rangX); sort(rangY);
+        double[][] res = new double[2][x.length];
+        int count =0, n=0;
+
+        for (int i=0; i<x.length; ++i){
+            if ((i<x.length-1)&&(Math.abs(rangX[i]-rangX[i+1]) <=0.0001)){
+                ++n;
+            }else{
+                if (n>0){
+                    double rang = (count+count+n)/2.0;
+                    int h = count+n;
+                    for (int c = count; c < h+1; ++c){
+                        res[0][findNum(rangX[c],0,h-c)] = rang;
+                    }
+                    count = ++h;
+                    n=0;
+                }else {
+                    res[0][findNum(rangX[i],0,0)] = count;
+                    ++count;
+                }
+            }
+        }
+        count =0; n=0;
+        for (int i=0; i<x.length; ++i){
+            if ((i<x.length-1)&&(Math.abs(rangY[i]-rangY[i+1]) <=0.0001)){
+                ++n;
+            }else{
+                if (n>0){
+                    double rang = (count+count+n)/2.0;
+                    int h = count+n;
+                    for (int c = count; c < h+1; ++c){
+                        res[1][findNum(rangY[c],1,h-c)] = rang;
+                    }
+                    count = ++h;
+                    n=0;
+                }else {
+                    res[1][findNum(rangY[i],1,0)] = count;
+                    ++count;
+                }
+            }
+        }
+        for (int i=0; i<x.length; ++i){
+            curX[i] = rangX[i]; curY[i] = rangY[i];
+        }
+        return res;
+    }
+
     public double rangSpirman(){
         double[] rangX = new double[x.length], rangY = new double[y.length];
         for (int i=0; i<x.length; ++i){
@@ -142,7 +220,8 @@ public class Mathematic {
             writer.add(Double.toString(sol[0]), Double.toString(sol[1]), Double.toString(sol[2]));
         }
         Graphic graphic = new Graphic(x,y);
-        graphic.draw(sol[0],sol[1],sol[2],type,String.format("%.4fx+%.4f",sol[0],sol[1]),x,function);
+        rang();
+        graphic.draw(sol[0],sol[1],sol[2],type,"Graph",curX,function);
         if (graph>0){
             graphic.writeChartToPDF(writer.getGraphPath());
         }

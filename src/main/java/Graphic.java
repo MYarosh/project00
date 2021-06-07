@@ -71,7 +71,7 @@ public class Graphic {
                         PlotOrientation.VERTICAL,
                         true, true, true);
         // Помещаем график на фрейм
-        if (func==4) {
+        {
             frame.getContentPane()
                     .add(new ChartPanel(chart));
             frame.setSize(400, 300);

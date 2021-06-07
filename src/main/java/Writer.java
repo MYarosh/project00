@@ -1,3 +1,5 @@
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,8 +17,8 @@ public class Writer {
     private String graphPath;
 
     public void add(String string0, String string1){
-        Row row;
-        Cell cell;
+        HSSFRow row;
+        HSSFCell cell;
         row = sheet.createRow(rownumber);
         cell = row.createCell(0, CellType.STRING);
         cell.setCellValue(string0);
@@ -26,8 +28,8 @@ public class Writer {
     }
 
     public void add(String string0, String string1, String string2){
-        Row row;
-        Cell cell;
+        HSSFRow row;
+        HSSFCell cell;
         row = sheet.createRow(rownumber);
         cell = row.createCell(0, CellType.STRING);
         cell.setCellValue(string0);
