@@ -20,9 +20,9 @@ public class Writer {
         HSSFRow row;
         HSSFCell cell;
         row = sheet.createRow(rownumber);
-        cell = row.createCell(0, CellType.STRING);
+        cell = row.createCell(0);
         cell.setCellValue(string0);
-        cell = row.createCell(1, CellType.STRING);
+        cell = row.createCell(1);
         cell.setCellValue(string1);
         rownumber++;
     }
@@ -31,11 +31,11 @@ public class Writer {
         HSSFRow row;
         HSSFCell cell;
         row = sheet.createRow(rownumber);
-        cell = row.createCell(0, CellType.STRING);
+        cell = row.createCell(0);
         cell.setCellValue(string0);
-        cell = row.createCell(1, CellType.STRING);
+        cell = row.createCell(1);
         cell.setCellValue(string1);
-        cell = row.createCell(2, CellType.STRING);
+        cell = row.createCell(2);
         cell.setCellValue(string2);
         rownumber++;
     }
@@ -50,6 +50,7 @@ public class Writer {
         }
         try {
             workbook.write(outFile);
+            workbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

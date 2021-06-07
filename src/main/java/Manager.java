@@ -24,16 +24,24 @@ public class Manager {
         if (scanner.next().equals("1")){
             System.out.println("Введите полный путь к файлу: ");
             String path = scanner.next();
-            isWrite = writer.setPath(path);
+            if (path.endsWith(".xls")) {
+                isWrite = writer.setPath(path);
+            }else{
+                System.out.println("It's not a .xls path to file!!!");
+            }
         }
         while (cycle) {
             System.out.println("Для вывода помощи введите команду help.");
             System.out.println("Выберите тип ввода(0 - из файла, 1 - с клавиатуры): ");
-            /* С файла. Первая строка - Х, разделенные запятыми, вторая строка - У, разделенные запятыми*/
             switch (scanner.next()) {
                 case ("0"): {
                     System.out.println("Введите полный путь к файлу: ");
                     String path = scanner.next();
+                    if (path.endsWith(".csv")) {
+                        isWrite = writer.setPath(path);
+                    }else{
+                        System.out.println("It's not a .csv path to file!!!");
+                    }
                     FileReader fr = null;
                     int lines = countLines(path);
                     if (lines < 0){
@@ -108,7 +116,7 @@ public class Manager {
         }
         Mathematic math = new Mathematic(lineX, lineY);
         cycle = true;
-        while (cycle){
+        while (true){
             System.out.println("Выберите необходимое действие:\n" +
                     "0 - Вычисление линейного коэффициента корреляции и проверка его на значимость;\n" +
                     "1 - Вычисление коэффициента Спирмена;\n" +
@@ -139,15 +147,21 @@ public class Manager {
                 }
                 case "1": {
                     System.out.printf("Коэффициент Спирмена равен %.6f\n", math.rangSpirman());
+                    String s = "";
                     if (math.rangSpirman() > 0){
+                        s = "Связь прямая";
                         System.out.println("Связь прямая");
                     }else if (math.rangSpirman() < 0){
+                        s = "Связь обратная";
                         System.out.println("Связь обратная");
                     }else{
+                        s = "Связи нет";
                         System.out.println("Связи нет");
                     }
-                    if (isWrite>0)
+                    if (isWrite>0){
                         writer.add("Коэффициент Спирмена", Double.toString(math.rangSpirman()));
+                        writer.add(s, "");
+                    }
                     break;
                 }
                 case "2":{
@@ -163,6 +177,13 @@ public class Manager {
                         System.out.printf("%.3f ",res[1][i]);
                     }
                     System.out.println();
+                    if (isWrite>0){
+                        writer.add("Ранги","");
+                        writer.add("X","Y");
+                        for (int i=0; i< lineX.length; ++i){
+                            writer.add(Double.toString(res[0][i]), Double.toString(res[1][i]));
+                        }
+                    }
                     break;
                 }
                 case "3": {
@@ -187,6 +208,11 @@ public class Manager {
                                 "При вводе отличного значения от предложенных двух запись в файл производиться не будет.");
                             System.out.println("Введите полный путь к файлу: ");
                             String path = scanner.next();
+                            if (path.endsWith(".pdf")) {
+                                isWrite = writer.setPath(path);
+                            }else{
+                               System.out.println("It's not a .pdf path to file!!!");
+                            }
                             try{
                                 FileWriter fr = new FileWriter(new File(path));
                                 writer.setGraphPath(path);
@@ -223,7 +249,10 @@ public class Manager {
                     }
                     break;
                 }
-                case "exit": System.exit(0);
+                case "exit": {
+                    writer.write();
+                    System.exit(0);
+                }
                 case "help":
                     System.out.println("Следуйте инструкциям на экране.\n" +
                             "Ввод цифры выбирает необходимое действие.\n" +
