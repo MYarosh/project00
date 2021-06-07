@@ -37,9 +37,7 @@ public class Manager {
                 case ("0"): {
                     System.out.println("Введите полный путь к файлу: ");
                     String path = scanner.next();
-                    if (path.endsWith(".csv")) {
-                        isWrite = writer.setPath(path);
-                    }else{
+                    if (!path.endsWith(".csv")) {
                         System.out.println("It's not a .csv path to file!!!");
                     }
                     FileReader fr = null;
@@ -208,9 +206,7 @@ public class Manager {
                                 "При вводе отличного значения от предложенных двух запись в файл производиться не будет.");
                             System.out.println("Введите полный путь к файлу: ");
                             String path = scanner.next();
-                            if (path.endsWith(".pdf")) {
-                                isWrite = writer.setPath(path);
-                            }else{
+                            if (!path.endsWith(".pdf")) {
                                System.out.println("It's not a .pdf path to file!!!");
                             }
                             try{
@@ -250,7 +246,7 @@ public class Manager {
                     break;
                 }
                 case "exit": {
-                    writer.write();
+                    if (isWrite>0) writer.write();
                     System.exit(0);
                 }
                 case "help":
